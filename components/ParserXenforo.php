@@ -5,7 +5,6 @@
  */
 
 namespace app\components;
-namespace app\components;
 
 use Yii;
 use \yii\base\Object;
@@ -153,10 +152,12 @@ class ParserXenforo extends Object
 	{
 		$this->_dom = new \DOMDocument();
 		libxml_use_internal_errors(true);
-		$this->_dom->loadHTML($this->_data);
+		if ($this->_dom->loadHTML($this->_data)) {
+			Yii::info(Yii::t('app', 'Create DomDocument'));
+		} else {
+			Yii::info(Yii::t('app', 'An error occurred when creating an object of class DOMDocument'));
+		}
 		libxml_use_internal_errors(false);
-
-		Yii::info(Yii::t('app', 'Create DomDocument'));
 
 		return $this;
 	}
@@ -180,6 +181,10 @@ class ParserXenforo extends Object
 	{
 		$xpathQuery = '*//h1';
 		$nodes = $this->_xpath->query($xpathQuery, $this->_dom);
+		if ($nodes->length === 0) {
+			Yii::info(Yii::t('app', 'Error parse title'));
+			return $this;
+		}
 		$this->_title = $nodes->item(0)->nodeValue;
 
 		Yii::info(Yii::t('app', 'Parse title'));
@@ -194,6 +199,10 @@ class ParserXenforo extends Object
 	{
 		$xpathQuery = '*//p[@id="pageDescription"]/a/abbr';
 		$nodes = $this->_xpath->query($xpathQuery, $this->_dom);
+		if ($nodes->length === 0) {
+			Yii::info(Yii::t('app', 'Error parse timestamp'));
+			return $this;
+		}
 		$this->_timestamp = $nodes->item(0)->getAttribute('data-time');
 
 		Yii::info(Yii::t('app', 'Parse timestamp'));
@@ -208,6 +217,10 @@ class ParserXenforo extends Object
 	{
 		$xpathQuery = '*//blockquote[@class="messageText ugc baseHtml"]';
 		$nodes = $this->_xpath->query($xpathQuery, $this->_dom);
+		if ($nodes->length === 0) {
+			Yii::info(Yii::t('app', 'Error parse content'));
+			return $this;
+		}
 		$this->_content = $nodes->item(0)->nodeValue;
 
 		Yii::info(Yii::t('app', 'Parse content'));
@@ -220,7 +233,11 @@ class ParserXenforo extends Object
 	 */
 	public function endParse()
 	{
-		Yii::info(Yii::t('app', 'End parse'));
+		if (isset($this->_content, $this->_timestamp, $this->_content)) {
+			Yii::info(Yii::t('app', 'End parse'));
+		} else {
+			Yii::info(Yii::t('app', 'Some data were not received'));
+		}
 
 		return $this;
 	}
