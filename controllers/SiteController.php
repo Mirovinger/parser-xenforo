@@ -18,7 +18,7 @@ class SiteController extends Controller
 
 	public function actionIndex()
 	{
-		$urlThread = 'http://73093611c484c1c8.demo-xenforo.com/130/index.php?threads/some-thread.1/';
+		$urlThread = 'http://9af5766eb2759a49.demo-xenforo.com/130/index.php?threads/some-thread.1/';
 		/** @var \app\components\ParserXenforo $dataParse */
 		$dataParse = Yii::$app->parser
 			->loadUsingCurl($urlThread)
